@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { DirectionsRenderer, DirectionsService, GoogleMap, Marker } from "@react-google-maps/api";
+import {
+  DirectionsRenderer,
+  DirectionsService,
+  GoogleMap,
+  Marker,
+} from "@react-google-maps/api";
 
 const containerStyle = {
   width: "100%",
@@ -209,38 +214,49 @@ function Map({ users, setUsers }) {
   useEffect(() => {
     if (!selected || !users) return;
     const directionsService = new window.google.maps.DirectionsService();
-
-    //every user = 1 direction service api call. Set a MAX for now.
-    const MAX = 3;
-    const resultPromises = users.slice(0,MAX).map(user => {
+    const resultPromises = users.map((user) => {
       console.log(user);
       return new Promise((resolve, reject) => {
-        directionsService.route({
-          origin: new window.google.maps.LatLng(user.coordinates.lat, user.coordinates.lng),
-          destination: new window.google.maps.LatLng(selected.lat, selected.lng),
-          travelMode: window.google.maps.TravelMode.DRIVING,
-        }, (result, status) => {
-          if (status === window.google.maps.DirectionsStatus.OK) {
-            setUsers(old => {
-              const duration = result.routes[0]?.legs[0]?.duration?.text || 'N/A';
-              const distance = result.routes[0]?.legs[0]?.distance?.text || 'N/A';
-              return old.map(x => x.id === user.id ? ({...x, distance:distance, duration: duration }) : x);
-            });
-            resolve(result);
-          } else {
-            alert(`error fetching directions ${result}`);
-            reject(result);
+        directionsService.route(
+          {
+            origin: new window.google.maps.LatLng(
+              user.coordinates.lat,
+              user.coordinates.lng
+            ),
+            destination: new window.google.maps.LatLng(
+              selected.lat,
+              selected.lng
+            ),
+            travelMode: window.google.maps.TravelMode[user.transport],
+          },
+          (result, status) => {
+            if (status === window.google.maps.DirectionsStatus.OK) {
+              setUsers((old) => {
+                const duration =
+                  result.routes[0]?.legs[0]?.duration?.text || "N/A";
+                const distance =
+                  result.routes[0]?.legs[0]?.distance?.text || "N/A";
+                return old.map((x) =>
+                  x.id === user.id
+                    ? { ...x, distance: distance, duration: duration }
+                    : x
+                );
+              });
+              resolve(result);
+            } else {
+              alert(`error fetching directions ${result}`);
+              reject(result);
+            }
           }
-        }); 
+        );
       });
     });
 
-    Promise.all(resultPromises).then(results => {
+    Promise.all(resultPromises).then((results) => {
       console.log(results);
       setDirectionResults(results);
     });
-    
-  },[selected]);
+  }, [selected]);
 
   return (
     <GoogleMap
@@ -268,31 +284,38 @@ function Map({ users, setUsers }) {
           }}
           key={key}
           position={{ lat: marker.lat, lng: marker.lng }}
-          onClick={(e) => { setSelected(marker); console.log(e) }}
+          onClick={(e) => {
+            setSelected(marker);
+            console.log(e);
+          }}
         />
       ))}
 
-      {
-        directionResults &&
-        directionResults.map(directions =>
+      {directionResults &&
+        directionResults.map((directions) => (
           <DirectionsRenderer
-
             // required
             options={{
               suppressMarkers: true,
-              directions: directions
+              directions: directions,
+              preserveViewport: true,
             }}
             // optional
-            onLoad={directionsRenderer => {
-              console.log('DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
+            onLoad={(directionsRenderer) => {
+              console.log(
+                "DirectionsRenderer onLoad directionsRenderer: ",
+                directionsRenderer
+              );
             }}
             // optional
-            onUnmount={directionsRenderer => {
-              console.log('DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
+            onUnmount={(directionsRenderer) => {
+              console.log(
+                "DirectionsRenderer onUnmount directionsRenderer: ",
+                directionsRenderer
+              );
             }}
           />
-          )
-      }
+        ))}
     </GoogleMap>
   );
 }
