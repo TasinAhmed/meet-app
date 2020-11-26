@@ -192,7 +192,7 @@ const options = {
   ],
 };
 let i = 0;
-function Map({ users }) {
+function Map({ users, setUsers }) {
   const [markers, setMarkers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [directionResults, setDirectionResults] = useState(null);
@@ -221,6 +221,11 @@ function Map({ users }) {
           travelMode: window.google.maps.TravelMode.DRIVING,
         }, (result, status) => {
           if (status === window.google.maps.DirectionsStatus.OK) {
+            setUsers(old => {
+              const duration = result.routes[0]?.legs[0]?.duration?.text || 'N/A';
+              const distance = result.routes[0]?.legs[0]?.distance?.text || 'N/A';
+              return old.map(x => x.id === user.id ? ({...x, distance:distance, duration: duration }) : x);
+            });
             resolve(result);
           } else {
             alert(`error fetching directions ${result}`);
@@ -271,8 +276,10 @@ function Map({ users }) {
         directionResults &&
         directionResults.map(directions =>
           <DirectionsRenderer
+
             // required
             options={{
+              suppressMarkers: true,
               directions: directions
             }}
             // optional

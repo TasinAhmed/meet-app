@@ -55,7 +55,7 @@ function App() {
                       if (name && address && coordinates) {
                         setUsers((current) => [
                           ...current,
-                          { name, address, coordinates },
+                          { name, address, coordinates, id: new Date().getUTCMilliseconds() },
                         ]);
                         close();
                       }
@@ -126,7 +126,7 @@ function App() {
           </div>
         </div>
         <div className="map__container">
-          <Map users={users} />
+          <Map users={users} setUsers={setUsers} />
         </div>
       </div>
     </LoadScript>
