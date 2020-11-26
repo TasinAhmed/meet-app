@@ -1,0 +1,111 @@
+@import "reactjs-popup/dist/index.css";
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+input {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.App {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  height: 100vh;
+  width: 100vw;
+}
+
+.users__menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: red;
+  padding: 1rem;
+}
+
+.users__add {
+  transform: scale(1.5);
+  cursor: pointer;
+}
+
+.newUser__close {
+  cursor: pointer;
+  position: absolute;
+  display: block;
+  padding: 2px 5px;
+  line-height: 20px;
+  right: -10px;
+  top: -10px;
+  font-size: 24px;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #cfcece;
+  outline: none;
+}
+
+.newUser__header {
+  text-align: center;
+}
+
+.newUser__modal {
+  padding: 1rem;
+}
+
+.newUser__form {
+  display: grid;
+  row-gap: 10px;
+  justify-items: center;
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form__group input {
+  width: 300px;
+}
+
+.address__input {
+  position: relative;
+}
+
+.address__suggestions {
+  position: absolute;
+  background-color: white;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+}
+
+.address__item {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+}
+
+.popup-content {
+  width: auto;
+}
+
+.users__list {
+  display: grid;
+  row-gap: 10px;
+  padding: 1rem;
+}
+
+.user__card {
+  background-color: aqua;
+  padding: 1rem;
+}
