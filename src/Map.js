@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import React, { useCallback, useEffect, useState } from "react";
+import { DirectionsRenderer, DirectionsService, GoogleMap, Marker } from "@react-google-maps/api";
 
 const containerStyle = {
   width: "100%",
@@ -191,10 +191,11 @@ const options = {
     },
   ],
 };
-
+let i = 0;
 function Map({ users }) {
   const [markers, setMarkers] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [directionResults, setDirectionResults] = useState(null);
 
   const mapClick = useCallback(
     ({ latLng }) =>
@@ -204,6 +205,37 @@ function Map({ users }) {
       ]),
     []
   );
+
+  useEffect(() => {
+    if (!selected || !users) return;
+    const directionsService = new window.google.maps.DirectionsService();
+
+    //every user = 1 direction service api call. Set a MAX for now.
+    const MAX = 3;
+    const resultPromises = users.slice(0,MAX).map(user => {
+      console.log(user);
+      return new Promise((resolve, reject) => {
+        directionsService.route({
+          origin: new window.google.maps.LatLng(user.coordinates.lat, user.coordinates.lng),
+          destination: new window.google.maps.LatLng(selected.lat, selected.lng),
+          travelMode: window.google.maps.TravelMode.DRIVING,
+        }, (result, status) => {
+          if (status === window.google.maps.DirectionsStatus.OK) {
+            resolve(result);
+          } else {
+            alert(`error fetching directions ${result}`);
+            reject(result);
+          }
+        }); 
+      });
+    });
+
+    Promise.all(resultPromises).then(results => {
+      console.log(results);
+      setDirectionResults(results)
+    });
+    
+  },[selected]);
 
   return (
     <GoogleMap
@@ -231,9 +263,29 @@ function Map({ users }) {
           }}
           key={key}
           position={{ lat: marker.lat, lng: marker.lng }}
-          onClick={() => setSelected(marker)}
+          onClick={(e) => { setSelected(marker); console.log(e) }}
         />
       ))}
+
+      {
+        directionResults &&
+        directionResults.map(directions =>
+          <DirectionsRenderer
+            // required
+            options={{
+              directions: directions
+            }}
+            // optional
+            onLoad={directionsRenderer => {
+              console.log('DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
+            }}
+            // optional
+            onUnmount={directionsRenderer => {
+              console.log('DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
+            }}
+          />
+          )
+      }
     </GoogleMap>
   );
 }
