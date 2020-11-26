@@ -194,6 +194,7 @@ const options = {
 
 function Map({ users }) {
   const [markers, setMarkers] = useState([]);
+  const [selected, setSelected] = useState(null);
 
   const mapClick = useCallback(
     ({ latLng }) =>
@@ -216,12 +217,23 @@ function Map({ users }) {
         <Marker
           key={key}
           position={{ lat: coordinates.lat, lng: coordinates.lng }}
+          icon={{
+            url: "/user.png",
+            scaledSize: new window.google.maps.Size(45, 45),
+          }}
         />
       ))}
-      {markers.map(({ lat, lng }, key) => (
-        <Marker key={key} position={{ lat: lat, lng: lng }} />
+      {markers.map((marker, key) => (
+        <Marker
+          icon={{
+            url: "/location.png",
+            scaledSize: new window.google.maps.Size(45, 45),
+          }}
+          key={key}
+          position={{ lat: marker.lat, lng: marker.lng }}
+          onClick={() => setSelected(marker)}
+        />
       ))}
-      <></>
     </GoogleMap>
   );
 }
