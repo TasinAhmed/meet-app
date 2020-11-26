@@ -232,7 +232,7 @@ function Map({ users }) {
 
     Promise.all(resultPromises).then(results => {
       console.log(results);
-      setDirectionResults(results)
+      setDirectionResults(results);
     });
     
   },[selected]);
